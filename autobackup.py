@@ -13,13 +13,13 @@ target = ''
 
 class MyHandler(FileSystemEventHandler):
     def on_modified(self, event):
-        console.print(f"[green]✓ Modificado:[/green] {event.src_path}")
+        console.print(f"[green]✓ Modified:[/green] {event.src_path}")
         copy_changes(source, target)
     def on_created(self, event):
-        console.print(f"[green]✓ Creado:[/green] {event.src_path}")
+        console.print(f"[green]✓ Created:[/green] {event.src_path}")
         # copy_changes(source, target)
     def on_deleted(self, event):
-        console.print(f"[green]✗ Borrado:[/green] {event.src_path}")
+        console.print(f"[green]✗ Deleted:[/green] {event.src_path}")
         copy_changes(source, target)
 
 
@@ -46,7 +46,7 @@ def copy_changes(source, target, retries=5, delay=1):
                         if attempt < retries - 1:
                             time.sleep(delay)
                         else:
-                            console.print(f"[red]✗ Error copiando {relative_path}:[/red] {e}")
+                            console.print(f"[red]✗ Error copying ({e}):[/red] {relative_path}")
     if changes == 0:
         console.print("[yellow]Nothing new to copy.[/yellow]")
 
