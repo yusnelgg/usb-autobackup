@@ -64,8 +64,12 @@ def main():
 
     console.print(f"[bold blue]📁 Source:[/bold blue] {source}")
     console.print(f"[bold blue]💾 Target:[/bold blue] {target}")
+    
+    console.print(f"Reporting changes to target")
+    copy_changes(source, target)
+    
     console.print(f"[bold green]🟢 Auto backup started... Press Ctrl+C to stop[/bold green]\n")
-
+    
     try:
         
         event_handler = MyHandler()
