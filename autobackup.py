@@ -77,21 +77,17 @@ def main():
     
     console.print(f"[bold green]🟢 Auto backup started... Press Ctrl+C to stop[/bold green]\n")
     
+    event_handler = MyHandler()
+    observer = Observer()
+    observer.schedule(event_handler, source, recursive=True)
+    observer.start()
     try:
-        
-        event_handler = MyHandler()
-        observer = Observer()
-        observer.schedule(event_handler, source, recursive=True)
-        observer.start()
-        try:
-            while True:
-                time.sleep(1)
-        except KeyboardInterrupt:
-            observer.stop()
-        observer.join()
-        
+        while True:
+            time.sleep(1)
     except KeyboardInterrupt:
+        observer.stop()
         console.print("\n[bold red]⛔ Backup stopped by user.[/bold red]")
+    observer.join()
 
 if __name__ == "__main__":
     main()
