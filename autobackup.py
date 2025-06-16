@@ -4,6 +4,25 @@ import shutil
 import time
 from rich.console import Console
 
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+import time
+
+source = ''
+target = ''
+
+class MyHandler(FileSystemEventHandler):
+    def on_modified(self, event):
+        print(f"Se ha modificado: {event.src_path}")
+        copy_changes(source, target)
+    def on_created(self, event):
+        print(f"Se ha creado: {event.src_path}")
+        # copy_changes(source, target)
+    def on_deleted(self, event):
+        print(f"Se ha borrado: {event.src_path}")
+        copy_changes(source, target)
+
+
 console = Console()
 
 def copy_changes(source, target):
@@ -25,9 +44,12 @@ def copy_changes(source, target):
         console.print("[yellow]Nothing new to copy.[/yellow]")
 
 def main():
+    
     if len(sys.argv) < 3:
         console.print("[red]Usage:[/red] python autobackup.py /source/path /target/path")
         sys.exit(1)
+    
+    global source, target
 
     source = sys.argv[1]
     target = sys.argv[2]
@@ -42,12 +64,21 @@ def main():
 
     console.print(f"[bold blue]📁 Source:[/bold blue] {source}")
     console.print(f"[bold blue]💾 Target:[/bold blue] {target}")
-    console.print(f"[bold green]🟢 Auto backup every 5 seconds started... Press Ctrl+C to stop[/bold green]\n")
+    console.print(f"[bold green]🟢 Auto backup started... Press Ctrl+C to stop[/bold green]\n")
 
     try:
-        while True:
-            copy_changes(source, target)
-            time.sleep(5)
+        
+        event_handler = MyHandler()
+        observer = Observer()
+        observer.schedule(event_handler, source, recursive=True)
+        observer.start()
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            observer.stop()
+        observer.join()
+        
     except KeyboardInterrupt:
         console.print("\n[bold red]⛔ Backup stopped by user.[/bold red]")
 
