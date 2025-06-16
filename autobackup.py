@@ -13,19 +13,19 @@ target = ''
 
 class MyHandler(FileSystemEventHandler):
     def on_modified(self, event):
-        print(f"Se ha modificado: {event.src_path}")
+        console.print(f"[green]✓ Modificado:[/green] {event.src_path}")
         copy_changes(source, target)
     def on_created(self, event):
-        print(f"Se ha creado: {event.src_path}")
+        console.print(f"[green]✓ Creado:[/green] {event.src_path}")
         # copy_changes(source, target)
     def on_deleted(self, event):
-        print(f"Se ha borrado: {event.src_path}")
+        console.print(f"[green]✗ Borrado:[/green] {event.src_path}")
         copy_changes(source, target)
 
 
 console = Console()
 
-def copy_changes(source, target):
+def copy_changes(source, target, retries=5, delay=1):
     changes = 0
     for root, _, files in os.walk(source):
         for file in files:
@@ -36,10 +36,17 @@ def copy_changes(source, target):
             os.makedirs(os.path.dirname(target_path), exist_ok=True)
 
             if not os.path.exists(target_path) or os.path.getmtime(source_path) > os.path.getmtime(target_path):
-                shutil.copy2(source_path, target_path)
-                console.print(f"[green]✓ Copied:[/green] {relative_path}")
-                changes += 1
-
+                for attempt in range(retries):
+                    try:
+                        shutil.copy2(source_path, target_path)
+                        console.print(f"[green]✓ Copied:[/green] {relative_path}")
+                        changes += 1
+                        break
+                    except PermissionError as e:
+                        if attempt < retries - 1:
+                            time.sleep(delay)
+                        else:
+                            console.print(f"[red]✗ Error copiando {relative_path}:[/red] {e}")
     if changes == 0:
         console.print("[yellow]Nothing new to copy.[/yellow]")
 
