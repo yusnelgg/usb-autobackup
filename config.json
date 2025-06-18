@@ -1,0 +1,12 @@
+{
+    "backups": [
+        {
+            "source": "C:\\Users\\YourName\\Desktop\\Source1",
+            "target": "C:\\Users\\YourName\\Desktop\\Backup1"
+        },
+        {
+            "source": "C:\\Users\\YourName\\Desktop\\Source2",
+            "target": "C:\\Users\\YourName\\Desktop\\Backup2"
+        }
+    ]
+}
